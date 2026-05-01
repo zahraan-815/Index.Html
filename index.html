@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ProSales Manager | Smart Product Catalog</title>
+    <!-- Google Fonts & Professional Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f7fc;
+            color: #1a2c3e;
+            padding: 24px 20px 60px;
+        }
+
+        .app-container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* header */
+        .brand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 16px;
+            gap: 16px;
+        }
+        .logo h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3c72, #2b4f8c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+        .logo p {
+            font-size: 0.85rem;
+            color: #5a6e7c;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 14px;
+        }
+        .add-product-btn {
+            background: #0f2b3d;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .add-product-btn:hover {
+            background: #1e4a76;
+            transform: scale(1.02);
+        }
+        .clear-all-btn {
+            background: #fff;
+            border: 1.5px solid #d4dee8;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #a03e2c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fffaf8;
+        }
+        .clear-all-btn:hover {
+            background: #ffe9e5;
+            border-color: #c76b5a;
+            color: #8b2c1a;
+        }
+
+        /* stats bar */
+        .stats-bar {
+            background: white;
+            border-radius: 28px;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 36px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            border: 1px solid #e9edf2;
+        }
+        .product-count {
+            font-weight: 500;
+            background: #eef2ff;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+
+        /* product grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 28px;
+            margin-top: 10px;
+        }
+
+        /* product card with delete button */
+        .product-card {
+            background: #ffffff;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.12);
+            transition: all 0.25s ease;
+            border: 1px solid #eef2f6;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 24px 36px -16px rgba(0,0,0,0.18);
+            border-color: #cddfe7;
+        }
+        .delete-product-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: rgba(255,255,255,0.92);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #bc5442;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: 0.15s;
+            z-index: 2;
+        }
+        .delete-product-btn:hover {
+            background: white;
+            color: #d32f2f;
+            transform: scale(1.05);
+        }
+        .product-img {
+            width: 100%;
+            height: 210px;
+            object-fit: cover;
+            background: #f1f5f9;
+            display: block;
+        }
+        .product-info {
+            padding: 18px 20px 22px;
+            cursor: pointer;  /* entire info area clickable for call */
+        }
+        .product-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0b2b3b;
+        }
+        .product-price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2c6e9e;
+            letter-spacing: -0.3px;
+        }
+
+        /* empty state */
+        .empty-state {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 60px 20px;
+            background: #f8fafc;
+            border-radius: 48px;
+            color: #6f8eaa;
+        }
+        .empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        /* modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-container {
+            background: white;
+            width: 90%;
+            max-width: 480px;
+            border-radius: 48px;
+            padding: 32px 28px 36px;
+            text-align: center;
+            box-shadow: 0 35px 45px -20px black;
+            animation: fadeSlideUp 0.2s ease;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .modal-container h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .call-btn {
+            background: #1f8a4c;
+            border: none;
+            padding: 16px 24px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            border-radius: 60px;
+            width: 100%;
+            margin: 20px 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: 0.18s;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        .call-btn:hover {
+            background: #0f6b3e;
+            transform: scale(0.98);
+        }
+        .close-modal {
+            background: #eef2f8;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            margin-top: 12px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        .form-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+        .form-group label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 32px;
+            border: 1.5px solid #e2e8f0;
+            font-family: 'Inter', monospace;
+            transition: 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #2c6e9e;
+            outline: none;
+        }
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .save-product {
+            background: #0f2b3d;
+            color: white;
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        .cancel-form {
+            background: #eef2f8;
+            flex: 1;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+        }
+        .warning-text {
+            font-size: 0.8rem;
+            margin-top: 10px;
+            color: #b45337;
+        }
+        footer {
+            margin-top: 55px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #8aa0b0;
+            border-top: 1px solid #e2edf5;
+            padding-top: 25px;
+        }
+        @media (max-width: 600px) {
+            body { padding: 16px; }
+            .brand-header { flex-direction: column; align-items: stretch; }
+            .action-buttons { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="brand-header">
+        <div class="logo">
+            <h1><i class="fas fa-cubes"></i> ProSales Manager</h1>
+            <p>Click product → call seller • Add / delete products</p>
+        </div>
+        <div class="action-buttons">
+            <button class="clear-all-btn" id="clearAllProductsBtn">
+                <i class="fas fa-trash-alt"></i> Remove all products
+            </button>
+            <button class="add-product-btn" id="openAddProductBtn">
+                <i class="fas fa-plus-circle"></i> Add product
+            </button>
+        </div>
+    </div>
+
+    <div class="stats-bar">
+        <span><i class="fas fa-tag"></i> Live catalog</span>
+        <span class="product-count" id="productCountDisplay">0 items</span>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+        <div class="empty-state" id="emptyPlaceholder">
+            <i class="fas fa-box-open"></i>
+            <h3>No products yet</h3>
+            <p>Click "Add product" to create your catalog. Each product has a delete button on the card.</p>
+        </div>
+    </div>
+    <footer>
+        <i class="fas fa-phone-alt"></i> Tap any product → one‑tap call to 9526985115 • Secure & fast
+    </footer>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div id="addProductModal" class="modal-overlay">
+    <div class="modal-container">
+        <h3><i class="fas fa-plus-circle"></i> Add new product</h3>
+        <div class="form-group">
+            <label>Product name *</label>
+            <input type="text" id="prodName" placeholder="e.g. Wireless Headphones Pro" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label>Price *</label>
+            <input type="text" id="prodPrice" placeholder="$79.99 / ₹1,299">
+        </div>
+        <div class="form-group">
+            <label>Image URL *</label>
+            <input type="text" id="prodImage" placeholder="https://picsum.photos/id/20/400/300">
+            <div class="warning-text"><i class="fas fa-info-circle"></i> Use any valid image link</div>
+        </div>
+        <div class="form-actions">
+            <button class="save-product" id="confirmAddProductBtn">Add product</button>
+            <button class="cancel-form" id="closeAddModalBtn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- CALL MODAL (with 9526985115) -->
+<div id="callModal" class="modal-overlay">
+    <div class="modal-container">
+        <i class="fas fa-phone-circle" style="font-size: 2.2rem; color: #1f8a4c;"></i>
+        <h3 id="modalProductName">Product</h3>
+        <div class="modal-product-detail" id="modalProductDetail" style="margin: 12px 0; font-size: 1rem;"></div>
+        <button class="call-btn" id="callButtonAction">
+            <i class="fas fa-phone-alt"></i> 9526985115
+        </button>
+        <button class="close-modal" id="closeCallModalBtn">Close</button>
+    </div>
+</div>
+
+<script>
+    // ---------- GLOBAL PRODUCTS ARRAY (localStorage) ----------
+    let products = [];
+
+    // ---------- Helper: load & save storage ----------
+    function loadProductsFromStorage() {
+        const stored = localStorage.getItem("prosales_cleaned_products");
+        if(stored) {
+            try {
+                products = JSON.parse(stored);
+            } catch(e) { products = []; }
+        } else {
+            // START WITH ZERO PRODUCTS (fully removed as requested)
+            products = [];
+            saveProductsToStorage();
+        }
+        updateProductGrid();
+    }
+
+    function saveProductsToStorage() {
+        localStorage.setItem("prosales_cleaned_products", JSON.stringify(products));
+    }
+
+    function generateId() {
+        return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
+    }
+
+    // Add product (validates fields)
+    function addProduct(name, price, imageUrl) {
+        if(!name.trim() || !price.trim() || !imageUrl.trim()) {
+            alert("Please fill all fields: product name, price, and image URL.");
+            return false;
+        }
+        const newProduct = {
+            id: generateId(),
+            name: name.trim(),
+            price: price.trim(),
+            imageUrl: imageUrl.trim()
+        };
+        products.push(newProduct);
+        saveProductsToStorage();
+        updateProductGrid();
+        return true;
+    }
+
+    // Delete single product by ID
+    function deleteProductById(productId) {
+        const confirmDelete = confirm("Remove this product from catalog?");
+        if(!confirmDelete) return false;
+        const newProducts = products.filter(p => p.id !== productId);
+        products = newProducts;
+        saveProductsToStorage();
+        updateProductGrid();
+        return true;
+    }
+
+    // Remove ALL products
+    function deleteAllProducts() {
+        if(products.length === 0) {
+            alert("No products to remove.");
+            return;
+        }
+        const confirmAll = confirm("⚠️ Are you sure you want to REMOVE ALL products? This action cannot be undone.");
+        if(confirmAll) {
+            products = [];
+            saveProductsToStorage();
+            updateProductGrid();
+        }
+    }
+
+    // Render product grid with delete buttons
+    function updateProductGrid() {
+        const grid = document.getElementById('productsGrid');
+        const countSpan = document.getElementById('productCountDisplay');
+        const emptyDiv = document.getElementById('emptyPlaceholder');
+
+        if(!grid) return;
+        // clear all current product cards
+        const existingCards = grid.querySelectorAll('.product-card');
+        existingCards.forEach(card => card.remove());
+
+        if(products.length === 0) {
+            if(emptyDiv) emptyDiv.style.display = 'block';
+            if(countSpan) countSpan.innerText = `0 items`;
+            return;
+        } else {
+            if(emptyDiv) emptyDiv.style.display = 'none';
+            if(countSpan) countSpan.innerText = `${products.length} item${products.length !== 1 ? 's' : ''}`;
+        }
+
+        // loop and build each product card
+        products.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.setAttribute('data-product-id', product.id);
+            
+            // DELETE BUTTON (separate from click to call)
+            const delBtn = document.createElement('button');
+            delBtn.className = 'delete-product-btn';
+            delBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+            delBtn.title = "Delete product";
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();  // prevent opening call modal
+                deleteProductById(product.id);
+            });
+            
+            // product image
+            const img = document.createElement('img');
+            img.className = 'product-img';
+            img.src = product.imageUrl;
+            img.alt = product.name;
+            img.onerror = function() { this.src = 'https://picsum.photos/id/1/400/300'; };
+            
+            // info area (clickable for call)
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'product-info';
+            const nameElem = document.createElement('div');
+            nameElem.className = 'product-name';
+            nameElem.innerText = product.name;
+            const priceElem = document.createElement('div');
+            priceElem.className = 'product-price';
+            priceElem.innerHTML = `${product.price} <span></span>`;
+            infoDiv.appendChild(nameElem);
+            infoDiv.appendChild(priceElem);
+            
+            // whole infoDiv triggers call modal
+            infoDiv.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openCallModal(product.id);
+            });
+            
+            card.appendChild(delBtn);
+            card.appendChild(img);
+            card.appendChild(infoDiv);
+            grid.appendChild(card);
+        });
+    }
+
+    // ---------- CALL MODAL LOGIC (Phone 9526985115)----------
+    let currentSelectedProduct = null;
+    function openCallModal(productId) {
+        const product = products.find(p => p.id === productId);
+        if(!product) return;
+        currentSelectedProduct = product;
+        const modalName = document.getElementById('modalProductName');
+        const modalDetail = document.getElementById('modalProductDetail');
+        if(modalName) modalName.innerText = product.name;
+        if(modalDetail) modalDetail.innerHTML = `<strong>💰 Price: ${product.price}</strong><br><i class="fas fa-phone"></i> Tap button to call seller`;
+        
+        const callModal = document.getElementById('callModal');
+        if(callModal) callModal.classList.add('active');
+    }
+    
+    function closeCallModal() {
+        const callModal = document.getElementById('callModal');
+        if(callModal) callModal.classList.remove('active');
+        currentSelectedProduct = null;
+    }
+    
+    // Initiate call to 9526985115
+    function initiateCall() {
+        const phoneNumber = "9526985115";
+        // Create tel: link and trigger call on mobile / desktop (Skype etc)
+        const telLink = document.createElement('a');
+        telLink.href = `tel:${phoneNumber}`;
+        telLink.style.display = 'none';
+        document.body.appendChild(telLink);
+        telLink.click();
+        document.body.removeChild(telLink);
+        // small feedback in console (non intrusive)
+        console.log(`Initiating call to ${phoneNumber}`);
+    }
+    
+    // ---------- ADD PRODUCT MODAL ----------
+    const addProductModal = document.getElementById('addProductModal');
+    const openAddBtn = document.getElementById('openAddProductBtn');
+    const closeAddModalBtn = document.getElementById('closeAddModalBtn');
+    const confirmAddBtn = document.getElementById('confirmAddProductBtn');
+    
+    function openAddModal() {
+        if(addProductModal) {
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodImage').value = '';
+            addProductModal.classList.add('active');
+        }
+    }
+    
+    function closeAddModal() {
+        if(addProductModal) addProductModal.classList.remove('active');
+    }
+    
+    function handleAddProduct() {
+        const name = document.getElementById('prodName').value;
+        const price = document.getElementById('prodPrice').value;
+        const image = document.getElementById('prodImage').value;
+        const success = addProduct(name, price, image);
+        if(success) closeAddModal();
+    }
+    
+    // ---------- EVENT LISTENERS & GLOBAL SETUP ----------
+    document.addEventListener('DOMContentLoaded', () => {
+        loadProductsFromStorage(); // loads empty array (all removed)
+        
+        // attach clear all button
+        const clearAllBtn = document.getElementById('clearAllProductsBtn');
+        if(clearAllBtn) clearAllBtn.addEventListener('click', deleteAllProducts);
+        
+        // add product modal controls
+        if(openAddBtn) openAddBtn.addEventListener('click', openAddModal);
+        if(closeAddModalBtn) closeAddModalBtn.addEventListener('click', closeAddModal);
+        if(confirmAddBtn) confirmAddBtn.addEventListener('click', handleAddProduct);
+        
+        // call modal events
+        const callActionBtn = document.getElementById('callButtonAction');
+        if(callActionBtn) callActionBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            initiateCall();
+        });
+        
+        const closeCallBtn = document.getElementById('closeCallModalBtn');
+        if(closeCallBtn) closeCallBtn.addEventListener('click', closeCallModal);
+        
+        // modal background click to close
+        const modalOverlays = [addProductModal, document.getElementById('callModal')];
+        modalOverlays.forEach(modal => {
+            if(modal) {
+                modal.addEventListener('click', (e) => {
+                    if(e.target === modal) {
+                        if(modal === addProductModal) closeAddModal();
+                        else closeCallModal();
+                    }
+                });
+            }
+        });
+        
+        // escape key
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') {
+                if(addProductModal && addProductModal.classList.contains('active')) closeAddModal();
+                const callM = document.getElementById('callModal');
+                if(callM && callM.classList.contains('active')) closeCallModal();
+            }
+        });
+        
+        // Set placeholder for image input to nicer example
+        const imgField = document.getElementById('prodImage');
+        if(imgField) imgField.placeholder = "https://picsum.photos/id/26/400/300";
+    });
+    
+    // In case of dynamic updates, we ensure product deletion updates everything.
+    window.deleteProductById = deleteProductById;
+    window.deleteAllProducts = deleteAllProducts;
+</script>
+</body>
+</html>
